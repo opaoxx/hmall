@@ -10,6 +10,33 @@ dependency-reduced-pom.xml
 logs/
 *.log
 
+# Frontend dependencies and build output
+**/node_modules/
+**/dist/
+**/.vite/
+**/.cache/
+*.tsbuildinfo
+
+# Nginx runtime files
+/hmall-nginx/logs/
+/hmall-nginx/temp/
+/hmall-nginx/client_body_temp/
+/hmall-nginx/proxy_temp/
+/hmall-nginx/fastcgi_temp/
+/hmall-nginx/uwsgi_temp/
+/hmall-nginx/scgi_temp/
+
+# Local IDE metadata copied into the frontend directory
+/hmall-nginx/.idea/
+
+# Generated SQL backups; keep sql/*.sql project scripts tracked
+sql/backup/
+sql/backups/
+sql/dump/
+*.sql.gz
+*.dump
+*.bak
+
 ### IntelliJ IDEA ###
 .idea/modules.xml
 .idea/jarRepositories.xml
