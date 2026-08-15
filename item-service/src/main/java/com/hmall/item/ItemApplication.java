@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @MapperScan("com.hmall.item.mapper")
 @SpringBootApplication
-public class HMallApplication {
+public class ItemApplication {
     public static void main(String[] args) {
-        SpringApplication.run(HMallApplication.class, args);
+        SpringApplication.run(ItemApplication.class, args);
     }
 }

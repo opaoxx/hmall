@@ -1,22 +1,25 @@
-package com.hmall.service.impl;
+package com.hmall.cart.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hmall.common.exception.BadRequestException;
+import com.hmall.cart.domain.dto.CartFormDTO;
+import com.hmall.cart.domain.dto.ItemDTO;
+import com.hmall.cart.domain.po.Cart;
+import com.hmall.cart.domain.vo.CartVO;
+import com.hmall.cart.mapper.CartMapper;
+import com.hmall.cart.service.ICartService;
 import com.hmall.common.exception.BizIllegalException;
 import com.hmall.common.utils.BeanUtils;
 import com.hmall.common.utils.CollUtils;
 import com.hmall.common.utils.UserContext;
-import com.hmall.domain.dto.CartFormDTO;
-import com.hmall.domain.dto.ItemDTO;
-import com.hmall.domain.po.Cart;
-import com.hmall.domain.vo.CartVO;
-import com.hmall.mapper.CartMapper;
-import com.hmall.service.ICartService;
-import com.hmall.service.IItemService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,7 +40,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
 
-    private final IItemService itemService;
+    private final RestTemplate restTemplate;
 
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
@@ -84,7 +87,24 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         // 1.获取商品id
         Set<Long> itemIds = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
         // 2.查询商品
-        List<ItemDTO> items = itemService.queryItemByIds(itemIds);
+//        List<ItemDTO> items = itemService.queryItemByIds(itemIds);
+        //利用RestTemplate发起http网络请求
+        ResponseEntity<List<ItemDTO>> response = restTemplate.exchange(
+                "http://localhost:8081/items?ids={ids}",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<ItemDTO>>() {
+                },
+                Map.of("ids", CollUtil.join(itemIds, ","))
+        );
+        //检查响应是否成功
+        if(!response.getStatusCode().is2xxSuccessful()){
+            return;
+        }
+
+        //响应成功，取出数据
+        List<ItemDTO> items = response.getBody();
+
         if (CollUtils.isEmpty(items)) {
             return;
         }

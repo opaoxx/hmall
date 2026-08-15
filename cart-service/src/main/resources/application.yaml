@@ -1,12 +1,12 @@
 server:
-  port: 8081
+  port: 8082
 spring:
   application:
-    name: item-service
+    name: cart-service
   profiles:
     active: dev
   datasource:
-    url: jdbc:mysql://${hm.db.host}:${hm.db.port}/hm-item?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${hm.db.host}:${hm.db.port}/hm-cart?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: ${hm.db.pw}
@@ -27,8 +27,8 @@ logging:
 knife4j:
   enable: true
   openapi:
-    title: 黑马商品管理接口文档
-    description: "黑马商品管理接口文档"
+    title: 黑马商城购物车接口文档
+    description: "黑马商城购物车接口文档"
     email: zhanghuyi@itcast.cn
     concat: 虎哥
     url: https://www.itcast.cn
@@ -38,5 +38,5 @@ knife4j:
         group-name: default
         api-rule: package
         api-rule-resources:
-          - com.hmall.item.controller
+          - com.hmall.cart.controller
 
