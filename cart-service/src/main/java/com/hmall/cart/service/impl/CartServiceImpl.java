@@ -1,11 +1,11 @@
 package com.hmall.cart.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hmall.api.client.ItemClient;
+import com.hmall.api.dto.ItemDTO;
 import com.hmall.cart.domain.dto.CartFormDTO;
-import com.hmall.cart.domain.dto.ItemDTO;
 import com.hmall.cart.domain.po.Cart;
 import com.hmall.cart.domain.vo.CartVO;
 import com.hmall.cart.mapper.CartMapper;
@@ -15,11 +15,7 @@ import com.hmall.common.utils.BeanUtils;
 import com.hmall.common.utils.CollUtils;
 import com.hmall.common.utils.UserContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +36,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
 
-    private final RestTemplate restTemplate;
+//    private final RestTemplate restTemplate;
+//    private final DiscoveryClient discoveryClient;
+    private final ItemClient itemClient;
 
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
@@ -88,22 +86,30 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         Set<Long> itemIds = vos.stream().map(CartVO::getItemId).collect(Collectors.toSet());
         // 2.查询商品
 //        List<ItemDTO> items = itemService.queryItemByIds(itemIds);
-        //利用RestTemplate发起http网络请求
-        ResponseEntity<List<ItemDTO>> response = restTemplate.exchange(
-                "http://localhost:8081/items?ids={ids}",
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<ItemDTO>>() {
-                },
-                Map.of("ids", CollUtil.join(itemIds, ","))
-        );
-        //检查响应是否成功
-        if(!response.getStatusCode().is2xxSuccessful()){
-            return;
-        }
-
-        //响应成功，取出数据
-        List<ItemDTO> items = response.getBody();
+//        //根据服务名称获取服务的实例列表
+//        List<ServiceInstance> instances = discoveryClient.getInstances("item-service");
+//        if(CollUtil.isEmpty(instances)){
+//            return;
+//        }
+//        //手写负载均衡，从列表中挑选一个实例
+//        ServiceInstance instance = instances.get(RandomUtil.randomInt(instances.size()));
+//        //利用RestTemplate发起http网络请求
+//        ResponseEntity<List<ItemDTO>> response = restTemplate.exchange(
+//                instance.getUri() + "/items?ids={ids}",
+//                HttpMethod.GET,
+//                null,
+//                new ParameterizedTypeReference<List<ItemDTO>>() {
+//                },
+//                Map.of("ids", CollUtil.join(itemIds, ","))
+//        );
+//        //检查响应是否成功
+//        if(!response.getStatusCode().is2xxSuccessful()){
+//            return;
+//        }
+//
+//        //响应成功，取出数据
+//        List<ItemDTO> items = response.getBody();
+        List<ItemDTO> items = itemClient.queryItemByIds(itemIds);
 
         if (CollUtils.isEmpty(items)) {
             return;
