@@ -1,32 +1,5 @@
 server:
   port: 8080
-spring:
-  application:
-    name: gateway
-  cloud:
-    nacos:
-      server-addr: 127.0.0.1:8848
-      discovery:
-        username: nacos
-        password: nacos
-    gateway:
-      routes:
-        - id: item-service
-          uri: lb://item-service
-          predicates:
-            - Path=/items/**,/search/**
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/users/**,/addresses/**
-        - id: cart-service
-          uri: lb://cart-service
-          predicates:
-            - Path=/carts/**
-        - id: trade-service
-          uri: lb://trade-service
-          predicates:
-            - Path=/orders/**
 hm:
   jwt:
     location: classpath:hmall.jks
