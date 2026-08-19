@@ -11,7 +11,7 @@ public class UserInfoInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //获取用户登录信息
-        String userInfo = request.getHeader("userInfo");
+        String userInfo = request.getHeader("user-info");
         //判断是否获取成功，如果有，则存入ThreadLocal
         if(StrUtil.isNotBlank(userInfo)){
             UserContext.setUser(Long.valueOf(userInfo));

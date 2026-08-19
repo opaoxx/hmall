@@ -6,6 +6,8 @@
     <file url="file://$PROJECT_DIR$/sql/hm-trade.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/sql/hm-user.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/sql/nacos.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/sql/seata-at.sql" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/sql/seata-tc.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/sql/user.sql" dialect="MySQL" />
     <file url="PROJECT" dialect="MySQL" />
   </component>

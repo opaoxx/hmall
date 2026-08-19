@@ -42,7 +42,7 @@ public class CartController {
 
     @ApiOperation("查询购物车列表")
     @GetMapping
-    public List<CartVO> queryMyCarts(@RequestParam(value = "user-info", required = false) String userInfo){
+    public List<CartVO> queryMyCarts(@RequestHeader(value = "user-info", required = false) String userInfo){
         System.out.println("userInfo = " + userInfo);
         return cartService.queryMyCarts();
     }

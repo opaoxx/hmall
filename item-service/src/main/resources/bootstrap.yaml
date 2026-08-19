@@ -20,3 +20,5 @@ spring:
             refresh: true
           - dataId: shared-swagger.yaml # 共享Swagger配置
             refresh: true
+          - dataId: shared-seata.yaml # 共享Seata配置
+            refresh: true
