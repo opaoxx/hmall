@@ -1,0 +1,156 @@
+name: hmall
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hmall-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: hmall
+    ports:
+      - "3307:3306"
+    volumes:
+      - hmall-mysql-data:/var/lib/mysql
+      - F:/BaiduNetdiskDownload/mysql/init:/docker-entrypoint-initdb.d:ro
+      - hmall-mysql-conf:/etc/mysql/conf.d
+    networks:
+      - hmall-net
+
+  nacos:
+    image: nacos/nacos-server:v2.2.0
+    container_name: hmall-nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MYSQL_SERVICE_HOST: hmall-mysql
+      MYSQL_SERVICE_DB_NAME: nacos
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_USER: root
+      MYSQL_SERVICE_PASSWORD: root
+      MYSQL_SERVICE_DB_PARAM: "characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai"
+      NACOS_AUTH_ENABLE: "true"
+      NACOS_AUTH_TOKEN: "YmWdAAfX096lmCQVjgALv2Ztz5OEWjtYOCm+jvyBy7s="
+      NACOS_AUTH_IDENTITY_KEY: hmall-nacos
+      NACOS_AUTH_IDENTITY_VALUE: Dk91ZY546VqdQTRJWUl5AVKM
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9849:9849"
+    volumes:
+      - hmall-nacos-logs:/home/nacos/logs
+    depends_on:
+      - mysql
+    networks:
+      - hmall-net
+
+  sentinel-dashboard:
+    image: bladex/sentinel-dashboard:1.8.6
+    container_name: sentinel-dashboard
+    restart: unless-stopped
+    ports:
+      - "8090:8858"
+    networks:
+      - hmall-net
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: hmall-nginx
+    restart: unless-stopped
+    ports:
+      - "18080:18080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./hmall-nginx/conf/mime.types:/etc/nginx/mime.types:ro
+      - ./hmall-nginx/conf/nginx.docker.conf:/etc/nginx/nginx.conf:ro
+      - ./hmall-nginx/html:/etc/nginx/html:ro
+    networks:
+      - hmall-net
+
+  seata-server:
+    image: seataio/seata-server:1.5.2
+    container_name: seata-server
+    restart: unless-stopped
+    ports:
+      - "7091:7091"
+      - "8091:8091"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./docker/seata/application.yml:/seata-server/resources/application.yml:ro
+    networks:
+      - hmall-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: hmall-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: root
+      RABBITMQ_DEFAULT_PASS: root
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - hmall-rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - hmall-net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.4
+    container_name: hmall-elasticsearch
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+      - es-plugins:/usr/share/elasticsearch/plugins
+    networks:
+      - hmall-search
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.1.4
+    container_name: hmall-kibana
+    restart: unless-stopped
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - hmall-search
+
+volumes:
+  hmall-mysql-data:
+    name: hmall-mysql-data
+    external: true
+  hmall-mysql-conf:
+    name: hmall-mysql-conf
+    external: true
+  hmall-nacos-logs:
+    name: hmall-nacos-logs
+    external: true
+  hmall-rabbitmq-data:
+    name: hmall-rabbitmq-data
+    external: true
+  es-data:
+    name: es-data
+    external: true
+  es-plugins:
+    name: es-plugins
+    external: true
+
+networks:
+  hmall-net:
+    name: hmall-net
+    external: true
+  hmall-search:
+    name: hmall-search
+    external: true
