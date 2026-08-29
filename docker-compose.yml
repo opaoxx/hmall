@@ -127,6 +127,47 @@ services:
     networks:
       - hmall-search
 
+  zipkin:
+    image: openzipkin/zipkin:3.6.1
+    container_name: hmall-zipkin
+    restart: unless-stopped
+    ports:
+      - "9411:9411"
+    networks:
+      - hmall-net
+
+  prometheus:
+    image: prom/prometheus:v3.14.0
+    container_name: hmall-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    networks:
+      - hmall-net
+
+  grafana:
+    image: grafana/grafana:13.1.4
+    container_name: hmall-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: root
+      GF_SECURITY_ADMIN_PASSWORD: root
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - hmall-net
+
 volumes:
   hmall-mysql-data:
     name: hmall-mysql-data
@@ -146,6 +187,10 @@ volumes:
   es-plugins:
     name: es-plugins
     external: true
+  prometheus-data:
+    name: prometheus-data
+  grafana-data:
+    name: grafana-data
 
 networks:
   hmall-net:
