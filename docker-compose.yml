@@ -99,7 +99,7 @@ services:
       - hmall-net
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:9.1.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.18
     container_name: hmall-elasticsearch
     restart: unless-stopped
     environment:
@@ -115,7 +115,7 @@ services:
       - hmall-search
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:9.1.4
+    image: docker.elastic.co/kibana/kibana:7.17.18
     container_name: hmall-kibana
     restart: unless-stopped
     environment:
@@ -182,10 +182,10 @@ volumes:
     name: hmall-rabbitmq-data
     external: true
   es-data:
-    name: es-data
+    name: es-data-7
     external: true
   es-plugins:
-    name: es-plugins
+    name: es-plugins-7
     external: true
   prometheus-data:
     name: prometheus-data
